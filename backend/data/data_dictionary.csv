@@ -1,0 +1,18 @@
+Category,Column Header,Business Header,Definition,Example,,
+Electric Vehicles,VIN (1-10),VIN,Vehicle Identification Number,5YJ3E1EB6K,,
+Electric Vehicles,County,County,The county in Washington state where the vehicle is registered.,King,,
+Electric Vehicles,City,City,The city where the vehicle is registered.,Seattle,,
+Electric Vehicles,State,State,The state where the vehicle is registered.,WA,,
+Electric Vehicles,Postal Code,Postal Code,The postal code of the vehicle's registered location.,98178,,
+Electric Vehicles,Model Year,Model Year,The manufacturing year of the vehicle.,2019,,
+Electric Vehicles,Make,Make,The manufacturer of the vehicle (e.g., Tesla, Nissan).,TESLA
+Electric Vehicles,Model,Model,The specific model of the vehicle (e.g., Model 3, Leaf).,MODEL 3
+Electric Vehicles,Electric Vehicle Type,EV Type,"The type of electric vehicle, either Battery Electric Vehicle (BEV) or Plug-in Hybrid Electric Vehicle (PHEV).",Battery Electric Vehicle (BEV),,
+Electric Vehicles,Clean Alternative Fuel Vehicle (CAFV) Eligibility,CAFV Eligibility,"Describes if the vehicle is eligible for Clean Alternative Fuel Vehicle status. Can be 'Clean Alternative Fuel Vehicle Eligible', 'Not eligible due to low battery range', or 'Eligibility unknown'.",Clean Alternative Fuel Vehicle Eligible,,
+Electric Vehicles,Electric Range,Electric Range,The vehicle's electric range in miles on a single charge. A value of 0 means the range is unknown.,220,,
+Electric Vehicles,Base MSRP,Base MSRP,The Manufacturer's Suggested Retail Price. A value of 0 means the MSRP is unknown.,0,,
+Electric Vehicles,Legislative District,Legislative District,The legislative district for the vehicle's location.,37,,
+Electric Vehicles,DOL Vehicle ID,DOL ID,A unique ID assigned by the Department of Licensing.,101250425,,
+Electric Vehicles,Vehicle Location,Location Point,The geographic coordinates (longitude, latitude) of the vehicle's registered city.,POINT (-122.23825 47.49461),
+Electric Vehicles,Electric Utility,Utility Provider,The electric utility company associated with the vehicle's location.,CITY OF SEATTLE - (WA)|CITY OF TACOMA - (WA),,
+Electric Vehicles,2020 Census Tract,Census Tract,The 2020 census tract for the vehicle's location.,53033011902,,
