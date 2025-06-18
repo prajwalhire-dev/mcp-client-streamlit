@@ -192,3 +192,7 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+#ignore files
+/backend/data/electric_vehicle_data.db
+/backend/data/Electric_Vehicle_Population_Data.csv
