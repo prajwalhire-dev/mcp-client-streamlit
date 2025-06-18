@@ -1,14 +1,12 @@
 import asyncio
-import streamlit as st
 from chatbot import Chatbot
 
-# Configuration
-API_URL = "http://localhost:8000"
-
-async def main():
-    st.set_page_config(page_title="MCP SQL Agent", page_icon="🤖")
-    chatbot = Chatbot(API_URL)
+async def run_app():
+    """Initializes and renders the chatbot application."""
+    api_url = "http://localhost:8000"
+    chatbot = Chatbot(api_url)
     await chatbot.render()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Runs the asynchronous application
+    asyncio.run(run_app())
