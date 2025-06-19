@@ -7,6 +7,7 @@ class Chatbot:
         self.api_url = api_url
         if "messages" not in st.session_state:
             st.session_state.messages = []
+        # Flag to track if the backend needs to be called
         if "run_backend" not in st.session_state:
             st.session_state.run_backend = False
 
@@ -28,8 +29,6 @@ class Chatbot:
             "Final Answer Agent": "Formats the data returned from the database into a human-readable final answer."
         }
     
-    # --- CHANGE 1: Adopted your friend's approach for the dialog ---
-    # The @st.dialog decorator turns this entire method into a pop-up window.
     @st.dialog("About The Agents")
     def show_agent_explanations_dialog(self):
         """Creates the content that will be shown inside the pop-up dialog."""
@@ -39,23 +38,25 @@ class Chatbot:
     def display_history(self, chat_container, tool_container):
         """Displays the entire message history from the session state."""
         for message in st.session_state.messages:
-            role = message.get("role")
-            content = message.get("content")
+            self.display_message(message, chat_container, tool_container)
 
+    def display_message(self, message: Dict, chat_container, tool_container):
+        """Displays a single message in the correct column with the correct alignment."""
+        role = message.get("role")
+        content = message.get("content")
+
+        with chat_container:
             if role == "user" and isinstance(content, str):
-                with chat_container:
+                _, col2 = st.columns([1, 4])
+                with col2:
                     with st.chat_message("user"):
                         st.markdown(content)
+
             elif role == "assistant" and isinstance(content, list):
+                # This logic is for the right-hand "Agent Steps" panel
                 has_tool_calls = any(block.get("type") == "tool_use" for block in content)
-                if not has_tool_calls:
-                    final_text_blocks = [block for block in content if block.get("type") == "text" and block.get("text")]
-                    if final_text_blocks:
-                        with chat_container:
-                            with st.chat_message("assistant"):
-                                for block in final_text_blocks:
-                                    st.markdown(block.get("text"))
                 tool_use_blocks = [block for block in content if block.get("type") == "tool_use"]
+                
                 if tool_use_blocks:
                     with tool_container:
                         for block in tool_use_blocks:
@@ -63,6 +64,16 @@ class Chatbot:
                             friendly_name = self.tool_friendly_names.get(technical_name, technical_name)
                             st.info(f"**Tool Used:** {friendly_name}")
                             st.json(block.get('input', {}), expanded=False)
+                
+                # This logic is for the left-hand "Chat Conversation" panel
+                if not has_tool_calls:
+                    final_text_blocks = [block for block in content if block.get("type") == "text" and block.get("text")]
+                    if final_text_blocks:
+                        col1, _ = st.columns([4, 1])
+                        with col1:
+                            with st.chat_message("assistant"):
+                                for block in final_text_blocks:
+                                    st.markdown(block.get("text"))
 
     async def render(self):
         """Sets up the UI and handles the main application logic."""
@@ -87,22 +98,24 @@ class Chatbot:
             with header_col:
                 st.header("Agent's Internal Steps")
             with button_col:
-                # --- CHANGE 2: The button now calls the dialog function on click ---
                 st.button("About Agents", on_click=self.show_agent_explanations_dialog)
             
             tool_container = st.container(height=600, border=True)
 
-        # Display the history from the session state
+        if 'show_info' in st.session_state and st.session_state.show_info:
+            self.show_agent_explanations_dialog()
+
+        # Always display the full, persistent history
         self.display_history(chat_container, tool_container)
         
-        # Logic to handle user input
+        # Handle user input
         if query := st.chat_input("Ask a question about the vehicle data..."):
             st.session_state.messages.append({"role": "user", "content": query})
             st.session_state.run_backend = True
             st.rerun()
 
-        # Logic to call the backend
-        if st.session_state.run_backend:
+        # Call the backend if the flag is set
+        if st.session_state.get('run_backend', False):
             st.session_state.run_backend = False
             query = st.session_state.messages[-1]['content']
             with st.spinner("Agent is thinking..."):
@@ -111,8 +124,19 @@ class Chatbot:
                         response = await client.post(f"{self.api_url}/query", json={"query": query})
                         response.raise_for_status()
                         data = response.json()
-                        st.session_state.messages = data["messages"]
+                        
+                        # --- THE FIX: Append new messages instead of overwriting history ---
+                        # The backend returns a history for the current query, starting with the user's question.
+                        # We get only the new messages from the assistant by slicing the list.
+                        new_assistant_messages = data["messages"][1:]
+                        
+                        # Add these new messages to our persistent conversation history
+                        st.session_state.messages.extend(new_assistant_messages)
+                        
+                        # Rerun to display the updated, full history
                         st.rerun()
+
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
+                    # On error, we remove the user's last question to prevent a broken state
                     st.session_state.messages.pop()
