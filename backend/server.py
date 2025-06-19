@@ -306,9 +306,16 @@ def generate_final_answer(question: str, query_result_dict: Dict) -> str:
     prompt = f"""
     You are a helpful assistant. Answer the user's question based on the provided data.
     If the data contains an error, explain it simply. If the data is empty, say so.
+   
 
     Original Question: "{question}"
     Data from Database: {query_result_json}
+
+    Instructions:
+    1. Provide a direct, clear answer without using phrases like "Based on the provided data" or "According to the context"
+    2. Use simple, non-technical language
+    3. Keep the response concise and to the point
+    4. If you don't have enough information to answer, simply say "I'm sorry, I don't have enough information to answer that question"
     """
     try:
         response = anthropic_client.messages.create(

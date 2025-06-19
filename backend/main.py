@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
     print("Backend starting up...")
     client = MCPClient()
     try:
-        # We assume server.py is in the same directory
+       #Attempt to connect to the MCP server
         await client.connect_to_server("server.py")
         app.state.client = client
         print("Backend startup complete. MCP Client connected.")
